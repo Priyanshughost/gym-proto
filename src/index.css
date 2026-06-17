@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+@import "tailwindcss";
+
+/* 1. Define your custom fonts */
+@font-face {
+  font-family: "Lausanne";
+  /* Change ../ to ./ */
+  src: url("./assets/TWKLausanne-250.woff2") format("woff2");
+  font-weight: 250;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Lausanne";
+  src: url("./assets/TWKLausanne-300.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Lausanne";
+  src: url("./assets/TWKLausanne-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* 2. Override Tailwind v4's default sans font */
+@theme {
+  --font-sans: "Lausanne", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* 3. Apply it to the body as a fallback (optional but recommended) */
+body {
+  font-family: var(--font-sans);
+  cursor: none;
+}
+
+a,
+button {
+  cursor: none;
+}
