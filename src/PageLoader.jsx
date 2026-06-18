@@ -30,7 +30,8 @@ export default function PageLoader({ onComplete }) {
         tl.to([leftTextRef.current, rightTextRef.current], {
             yPercent: 0,
             duration: 1.2,
-            ease: 'power4.out'
+            ease: 'power4.out',
+            delay: "0.5"
         })
 
             // 3. THE CRACK (The "Slice" effect)

@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -11,7 +11,6 @@ export default function Footer() {
     const topRef = useRef(null);
 
     useGSAP(() => {
-        // A clean, professional staggered reveal for the top links
         gsap.from(topRef.current.children, {
             y: 30,
             opacity: 0,
@@ -25,7 +24,6 @@ export default function Footer() {
             }
         });
 
-        // The massive brand text scales and fades up aggressively
         gsap.from(textRef.current, {
             yPercent: 50,
             opacity: 0,
@@ -40,12 +38,40 @@ export default function Footer() {
         });
     }, { scope: footerRef });
 
+    // NEW: Sync the CSS Mask with the global cursor state
+    useEffect(() => {
+        let frameId;
+        const updateMask = () => {
+            if (textRef.current && window.__CURSOR_STATE__) {
+                const rect = textRef.current.getBoundingClientRect();
+                const { x: cursorX, y: cursorY, scale } = window.__CURSOR_STATE__;
+
+                // Calculate mouse position relative to the h1 container
+                const localX = cursorX - rect.left;
+                const localY = cursorY - rect.top;
+
+                // Calculate exactly how wide the mask should be based on the cursor's scale
+                // The base width of the cursor is 16px (radius 8px)
+                const radius = 8 * scale;
+
+                // Draw the transparent radial mask
+                const maskStr = `radial-gradient(circle at ${localX}px ${localY}px, black ${radius}px, transparent ${radius}px)`;
+
+                textRef.current.style.WebkitMaskImage = maskStr;
+                textRef.current.style.maskImage = maskStr;
+            }
+            frameId = requestAnimationFrame(updateMask);
+        };
+
+        frameId = requestAnimationFrame(updateMask);
+        return () => cancelAnimationFrame(frameId);
+    }, []);
+
     return (
         <footer
             ref={footerRef}
             className="relative w-full bg-zinc-950 text-white pt-24 pb-8 px-6 md:px-12 font-sans border-t border-white/10 overflow-hidden"
         >
-            {/* Top Section: Navigation & Newsletter */}
             <div
                 ref={topRef}
                 className="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8 mb-24"
@@ -98,17 +124,25 @@ export default function Footer() {
                 </div>
             </div>
 
-            {/* Bottom Section: Massive Typographic Brand */}
-            <div className="w-full flex flex-col items-center justify-center border-t border-white/10 pt-12 relative">
+            <div
+                data-footer
+                className="w-full flex flex-col items-center justify-center border-t border-white/10 pt-12 relative"
+            >
                 <h1
                     ref={textRef}
-                    className="text-[18vw] leading-none font-bold tracking-tighter uppercase text-white/10 select-none"
+                    // NEW: Changed back to text-white. 
+                    // When masked, it will only render inside the dot. The difference cursor over white text makes it PURE BLACK.
+                    className="text-[18vw] leading-none font-bold tracking-tighter uppercase text-white select-none"
+                    // INITIAL STATE: Shoved entirely off-screen to avoid flashing before JS kicks in
+                    style={{
+                        WebkitMaskImage: 'radial-gradient(circle at -100px -100px, black 0px, transparent 0px)',
+                        maskImage: 'radial-gradient(circle at -100px -100px, black 0px, transparent 0px)'
+                    }}
                 >
                     GYM NAME
                 </h1>
 
-                {/* Absolute positioned copyright so it sits cleanly at the bottom */}
-                <div className="absolute bottom-0 w-full flex justify-between items-end pb-2">
+                <div className="absolute bottom-0 w-full flex justify-between items-end pb-2 px-6">
                     <span className="text-xs text-white/30 font-medium">© {new Date().getFullYear()} TOM FITNESS. ALL RIGHTS RESERVED.</span>
                     <span className="text-xs text-white/30 font-medium">BUILT FOR REAL RESULTS.</span>
                 </div>

@@ -20,30 +20,30 @@ export default function CursorDot() {
             mouse.x = e.clientX;
             mouse.y = e.clientY;
 
-            // Failsafe: Ensure the dot becomes visible the millisecond the mouse moves,
-            // covering cases where the mouse is already inside the window on page load.
             if (dot.style.opacity !== '1') {
                 dot.style.opacity = '1';
             }
         };
 
         const onMouseOver = (e) => {
-            const isInteractive = e.target.closest('[data-hover]');
-            if (isInteractive) {
+            if (e.target.closest('[data-footer]')) {
+                targetHoverScale = 25; // Massive scale for the spotlight
+            } else if (e.target.closest('[data-hover]')) {
                 targetHoverScale = 5;
             }
         };
 
         const onMouseOut = (e) => {
-            targetHoverScale = 1;
+            const related = e.relatedTarget;
+            if (!related || !related.closest('[data-footer], [data-hover]')) {
+                targetHoverScale = 1;
+            }
         };
 
-        // NEW: Detect when the mouse leaves the browser window entirely
         const onMouseLeaveWindow = () => {
             if (dot) dot.style.opacity = '0';
         };
 
-        // NEW: Detect when the mouse re-enters the browser window
         const onMouseEnterWindow = () => {
             if (dot) dot.style.opacity = '1';
         };
@@ -51,8 +51,6 @@ export default function CursorDot() {
         window.addEventListener('mousemove', onMouseMove);
         window.addEventListener('mouseover', onMouseOver);
         window.addEventListener('mouseout', onMouseOut);
-
-        // Use document-level event listeners for window boundaries
         document.addEventListener('mouseleave', onMouseLeaveWindow);
         document.addEventListener('mouseenter', onMouseEnterWindow);
 
@@ -70,8 +68,13 @@ export default function CursorDot() {
 
             currentHoverScale += (targetHoverScale - currentHoverScale) * 0.15;
 
-            const baseStretch = Math.min(1 + speed * 0.04, 2.5);
-            const baseSquash = Math.max(1 - speed * 0.04, 0.4);
+            // NEW: Disable stretch/squash when it's a massive spotlight. 
+            // This ensures it stays a perfect circle, exactly matching our CSS mask shape.
+            const isSpotlight = targetHoverScale > 5;
+            const stretchMult = isSpotlight ? 0 : 0.04;
+
+            const baseStretch = Math.min(1 + speed * stretchMult, 2.5);
+            const baseSquash = Math.max(1 - speed * stretchMult, 0.4);
 
             const finalStretch = baseStretch * currentHoverScale;
             const finalSquash = baseSquash * currentHoverScale;
@@ -82,6 +85,13 @@ export default function CursorDot() {
 
             lastDotPos.x = dotPos.x;
             lastDotPos.y = dotPos.y;
+
+            // NEW: Expose the smoothed state globally so the Footer mask can perfectly sync with it
+            window.__CURSOR_STATE__ = {
+                x: dotPos.x,
+                y: dotPos.y,
+                scale: currentHoverScale
+            };
 
             frameId = requestAnimationFrame(renderTick);
         };
@@ -101,8 +111,7 @@ export default function CursorDot() {
     return (
         <div
             ref={dotRef}
-            // NEW: Added opacity-0 initially and transition-opacity duration-300 for a buttery fade
-            className="fixed top-0 left-0 w-4 h-4 bg-white rounded-full pointer-events-none z-100 mix-blend-difference opacity-0 transition-opacity duration-300"
+            className="fixed top-0 left-0 w-4 h-4 bg-white rounded-full pointer-events-none z-[100] mix-blend-difference opacity-0 transition-opacity duration-300"
             style={{
                 transformOrigin: 'center center'
             }}
