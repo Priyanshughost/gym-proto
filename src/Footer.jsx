@@ -24,37 +24,35 @@ export default function Footer() {
             }
         });
 
-        gsap.from(textRef.current, {
-            yPercent: 50,
-            opacity: 0,
-            scale: 0.9,
-            duration: 1.5,
-            ease: 'expo.out',
-            scrollTrigger: {
-                trigger: footerRef.current,
-                start: 'top 75%',
-                toggleActions: 'play none none none',
-            }
-        });
+        // Only run this animation if the text actually exists (desktop)
+        if (textRef.current) {
+            gsap.from(textRef.current, {
+                yPercent: 50,
+                opacity: 0,
+                scale: 0.9,
+                duration: 1.5,
+                ease: 'expo.out',
+                scrollTrigger: {
+                    trigger: footerRef.current,
+                    start: 'top 75%',
+                    toggleActions: 'play none none none',
+                }
+            });
+        }
     }, { scope: footerRef });
 
-    // NEW: Sync the CSS Mask with the global cursor state
     useEffect(() => {
         let frameId;
         const updateMask = () => {
-            if (textRef.current && window.__CURSOR_STATE__) {
+            // Added check to ensure we only run this math if the H1 is visible
+            if (textRef.current && window.__CURSOR_STATE__ && window.innerWidth >= 768) {
                 const rect = textRef.current.getBoundingClientRect();
                 const { x: cursorX, y: cursorY, scale } = window.__CURSOR_STATE__;
 
-                // Calculate mouse position relative to the h1 container
                 const localX = cursorX - rect.left;
                 const localY = cursorY - rect.top;
-
-                // Calculate exactly how wide the mask should be based on the cursor's scale
-                // The base width of the cursor is 16px (radius 8px)
                 const radius = 8 * scale;
 
-                // Draw the transparent radial mask
                 const maskStr = `radial-gradient(circle at ${localX}px ${localY}px, black ${radius}px, transparent ${radius}px)`;
 
                 textRef.current.style.WebkitMaskImage = maskStr;
@@ -126,14 +124,13 @@ export default function Footer() {
 
             <div
                 data-footer
-                className="w-full flex flex-col items-center justify-center border-t border-white/10 pt-12 relative"
+                // NEW: Adjusted padding and layout so it handles mobile naturally
+                className="w-full flex flex-col items-center justify-center border-t border-white/10 pt-12 md:pt-16 relative"
             >
                 <h1
                     ref={textRef}
-                    // NEW: Changed back to text-white. 
-                    // When masked, it will only render inside the dot. The difference cursor over white text makes it PURE BLACK.
-                    className="text-[18vw] leading-none font-bold tracking-tighter uppercase text-white select-none"
-                    // INITIAL STATE: Shoved entirely off-screen to avoid flashing before JS kicks in
+                    // NEW: Added hidden md:block to hide entirely on mobile devices
+                    className="hidden md:block text-[18vw] leading-none font-bold tracking-tighter uppercase text-white select-none"
                     style={{
                         WebkitMaskImage: 'radial-gradient(circle at -100px -100px, black 0px, transparent 0px)',
                         maskImage: 'radial-gradient(circle at -100px -100px, black 0px, transparent 0px)'
@@ -142,9 +139,10 @@ export default function Footer() {
                     GYM NAME
                 </h1>
 
-                <div className="absolute bottom-0 w-full flex justify-between items-end pb-2 px-6">
-                    <span className="text-xs text-white/30 font-medium">© {new Date().getFullYear()} TOM FITNESS. ALL RIGHTS RESERVED.</span>
-                    <span className="text-xs text-white/30 font-medium">BUILT FOR REAL RESULTS.</span>
+                {/* NEW: Changed from strictly absolute. Now it flows naturally on mobile and goes absolute on desktop */}
+                <div className="relative md:absolute bottom-0 w-full flex flex-col md:flex-row justify-between items-center md:items-end gap-2 md:gap-0 pb-2 px-6">
+                    <span className="text-xs text-white/30 font-medium text-center">© {new Date().getFullYear()} TOM FITNESS. ALL RIGHTS RESERVED.</span>
+                    <span className="text-xs text-white/30 font-medium text-center">BUILT FOR REAL RESULTS.</span>
                 </div>
             </div>
         </footer>

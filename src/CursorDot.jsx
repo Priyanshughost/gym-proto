@@ -1,9 +1,25 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 export default function CursorDot() {
     const dotRef = useRef(null);
+    // NEW: State to track if the user has a real mouse
+    const [hasMouse, setHasMouse] = useState(true);
 
     useEffect(() => {
+        // Safely check if the device uses a fine pointer (mouse/trackpad)
+        const mediaQuery = window.matchMedia("(pointer: fine)");
+        setHasMouse(mediaQuery.matches);
+
+        const updateDevice = (e) => setHasMouse(e.matches);
+        mediaQuery.addEventListener("change", updateDevice);
+
+        return () => mediaQuery.removeEventListener("change", updateDevice);
+    }, []);
+
+    useEffect(() => {
+        // NEW: If they don't have a mouse (mobile/tablet), do NOT run the heavy JS loop
+        if (!hasMouse) return;
+
         const dot = dotRef.current;
 
         let mouse = { x: 0, y: 0 };
@@ -27,7 +43,7 @@ export default function CursorDot() {
 
         const onMouseOver = (e) => {
             if (e.target.closest('[data-footer]')) {
-                targetHoverScale = 25; // Massive scale for the spotlight
+                targetHoverScale = 25;
             } else if (e.target.closest('[data-hover]')) {
                 targetHoverScale = 5;
             }
@@ -68,8 +84,6 @@ export default function CursorDot() {
 
             currentHoverScale += (targetHoverScale - currentHoverScale) * 0.15;
 
-            // NEW: Disable stretch/squash when it's a massive spotlight. 
-            // This ensures it stays a perfect circle, exactly matching our CSS mask shape.
             const isSpotlight = targetHoverScale > 5;
             const stretchMult = isSpotlight ? 0 : 0.04;
 
@@ -86,7 +100,6 @@ export default function CursorDot() {
             lastDotPos.x = dotPos.x;
             lastDotPos.y = dotPos.y;
 
-            // NEW: Expose the smoothed state globally so the Footer mask can perfectly sync with it
             window.__CURSOR_STATE__ = {
                 x: dotPos.x,
                 y: dotPos.y,
@@ -106,7 +119,10 @@ export default function CursorDot() {
             document.removeEventListener('mouseenter', onMouseEnterWindow);
             cancelAnimationFrame(frameId);
         };
-    }, []);
+    }, [hasMouse]);
+
+    // NEW: Completely unmount the component on mobile to save performance
+    if (!hasMouse) return null;
 
     return (
         <div

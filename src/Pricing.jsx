@@ -104,7 +104,6 @@ const PricingCard = ({ tier }) => {
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             style={{ flexGrow: 1 }}
-            data-hover
             // Added 'pricing-card' class for the initial scroll trigger stagger
             className="pricing-card relative rounded-sm overflow-hidden flex flex-col justify-end p-6 md:p-8 border border-white/10 origin-center"
         >
@@ -178,7 +177,7 @@ const PricingCard = ({ tier }) => {
                         ))}
                     </ul>
 
-                    <button className="w-max bg-white text-black px-8 py-3 rounded-full text-sm font-bold uppercase tracking-wider hover:bg-zinc-200 transition-colors mt-auto pointer-events-auto">
+                    <button data-hover className="w-max bg-white text-black px-8 py-3 rounded-full text-sm font-bold uppercase tracking-wider hover:bg-zinc-200 transition-colors mt-auto pointer-events-auto">
                         Select {tier.name}
                     </button>
                 </div>
