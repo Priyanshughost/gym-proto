@@ -2,60 +2,9 @@ import React, { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { facilitiesData } from "./data"; // Adjust the import path if necessary
 
 gsap.registerPlugin(ScrollTrigger);
-
-const facilities = [
-
-    {
-
-        id: "01",
-
-        title: "FREE WEIGHTS",
-
-        desc: "10,000 sq ft of pure iron. Dumbbells up to 200lbs. No waiting.",
-
-        img: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop",
-
-    },
-
-    {
-
-        id: "02",
-
-        title: "THE PLATFORM",
-
-        desc: "Competition-grade bars, plates and racks. Built for serious strength.",
-
-        img: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=1965&auto=format&fit=crop",
-
-    },
-
-    {
-
-        id: "03",
-
-        title: "CONDITIONING",
-
-        desc: "Echo bikes, sleds and turf. Everything needed to build your engine.",
-
-        img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=2070&auto=format&fit=crop",
-
-    },
-
-    {
-
-        id: "04",
-
-        title: "RECOVERY",
-
-        desc: "Cold therapy, mobility space and recovery equipment.",
-
-        img: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070&auto=format&fit=crop",
-
-    },
-
-];
 
 export default function Facility() {
     const containerRef = useRef(null);
@@ -76,7 +25,7 @@ export default function Facility() {
 
             cards.forEach((card, index) => {
                 gsap.set(card, {
-                    zIndex: index - facilities.length,
+                    zIndex: index - facilitiesData.length,
                 });
 
                 if (index !== 0) {
@@ -90,7 +39,7 @@ export default function Facility() {
                 scrollTrigger: {
                     trigger: containerRef.current,
                     start: "top top",
-                    end: `+=${facilities.length * 30}%`,
+                    end: `+=${facilitiesData.length * 30}%`,
                     scrub: 1,
                     pin: true,
                     anticipatePin: 1,
@@ -145,7 +94,7 @@ export default function Facility() {
             // 3. Changed h-screen to h-[100dvh] for mobile browser address bars
             className="relative w-full h-screen bg-black overflow-hidden"
         >
-            {facilities.map((facility, index) => (
+            {facilitiesData.map((facility, index) => (
                 <div
                     key={facility.id}
                     ref={(el) => (cardsRef.current[index] = el)}

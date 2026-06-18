@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { philosophyData } from './data'; // Adjust the import path if necessary
 
 // Register the ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
@@ -86,7 +87,7 @@ export default function Philosophy() {
     >
       <div className="flex flex-col w-full max-w-7xl">
         <p className="text-sm font-semibold tracking-widest uppercase text-white/50 mb-8 md:mb-12">
-          [ Our Philosophy ]
+          {philosophyData.tagline}
         </p>
 
         <h2 className="text-[14vw] md:text-[10vw] leading-[0.85] font-bold tracking-tighter uppercase flex flex-col">
@@ -94,7 +95,7 @@ export default function Philosophy() {
           {/* LINE 1: Mask Reveal */}
           {/* overflow-hidden acts as the invisible box */}
           <span className="block overflow-hidden pb-4">
-            <span ref={line1Ref} className="block">No gimmicks.</span>
+            <span ref={line1Ref} className="block">{philosophyData.heading.line1}</span>
           </span>
 
           {/* LINE 2: The Scale Slam */}
@@ -103,20 +104,20 @@ export default function Philosophy() {
             ref={line2Ref}
             className="block text-white/30 italic pr-8 md:pr-16 text-right transform-origin-center"
           >
-            Just gravity.
+            {philosophyData.heading.line2}
           </span>
 
           {/* LINE 3: The Scrub */}
           {/* Relative container holds the two overlapping layers */}
           <span ref={line3ContainerRef} className="block relative mt-4 md:mt-0">
             {/* Base layer: Faded out */}
-            <span className="block text-white/10">And grit.</span>
+            <span className="block text-white/10">{philosophyData.heading.line3}</span>
             {/* Top layer: Pure white, hidden initially by GSAP clip-path */}
             <span
               ref={line3TopRef}
               className="block absolute top-0 left-0 text-white w-full"
             >
-              And grit.
+              {philosophyData.heading.line3}
             </span>
           </span>
 
@@ -124,7 +125,7 @@ export default function Philosophy() {
 
         <div ref={paragraphRef} className="mt-16 md:mt-24 ml-auto w-full max-w-md">
           <p className="text-lg md:text-xl font-light text-white/80 leading-relaxed">
-            We strip away the noise. No trendy workouts, no miracle supplements, and no ego. Just raw equipment, ruthless discipline, and a space built for those who put in the work.
+            {philosophyData.paragraph}
           </p>
         </div>
       </div>

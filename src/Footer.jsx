@@ -2,15 +2,34 @@ import React, { useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
+import { footerData } from './data'; // Adjust the import path if necessary
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Footer() {
     const footerRef = useRef(null);
+    const parallaxRef = useRef(null); // NEW: Inner wrapper for the parallax effect
     const textRef = useRef(null);
     const topRef = useRef(null);
 
     useGSAP(() => {
+        // 1. THE PARALLAX REVEAL EFFECT
+        gsap.fromTo(
+            parallaxRef.current,
+            { yPercent: -30 }, // Pushes the content up 30% initially
+            {
+                yPercent: 0,   // Settles to normal position as you scroll
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: footerRef.current,
+                    start: 'top bottom', // Starts when the very top of footer enters the bottom of screen
+                    end: 'top top',
+                    scrub: true, // Ties the animation frame-by-frame to the scrollbar
+                }
+            }
+        );
+
+        // 2. The Link Entry Stagger
         gsap.from(topRef.current.children, {
             y: 30,
             opacity: 0,
@@ -24,7 +43,7 @@ export default function Footer() {
             }
         });
 
-        // Only run this animation if the text actually exists (desktop)
+        // 3. The Giant Text Pop-in
         if (textRef.current) {
             gsap.from(textRef.current, {
                 yPercent: 50,
@@ -41,10 +60,10 @@ export default function Footer() {
         }
     }, { scope: footerRef });
 
+    // Cursor Mask Effect
     useEffect(() => {
         let frameId;
         const updateMask = () => {
-            // Added check to ensure we only run this math if the H1 is visible
             if (textRef.current && window.__CURSOR_STATE__ && window.innerWidth >= 768) {
                 const rect = textRef.current.getBoundingClientRect();
                 const { x: cursorX, y: cursorY, scale } = window.__CURSOR_STATE__;
@@ -68,81 +87,96 @@ export default function Footer() {
     return (
         <footer
             ref={footerRef}
-            className="relative w-full bg-zinc-950 text-white pt-24 pb-8 px-6 md:px-12 font-sans border-t border-white/10 overflow-hidden"
+            // Kept the top border and overflow hidden on the outer shell
+            className="relative w-full bg-zinc-800 text-white font-sans border-t border-white/10 overflow-hidden"
         >
-            <div
-                ref={topRef}
-                className="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8 mb-24"
-            >
-                {/* Brand Column */}
-                <div className="col-span-1 md:col-span-1">
-                    <div className="flex items-center gap-2 text-xl font-bold tracking-tight mb-6">
-                        <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                            <path d="M12 2L2 22h20L12 2zm0 3.8l7.2 14.2H4.8L12 5.8z" />
-                        </svg>
-                        TOM fitness
-                    </div>
-                    <p className="text-white/50 text-sm leading-relaxed max-w-xs">
-                        10,000 sq ft of pure iron. Engineered for athletes, powerlifters, and everyday grinders.
-                    </p>
-                </div>
+            {/* NEW: The Parallax Wrapper */}
+            {/* Moved the pt-24 pb-8 px-6 md:px-12 padding here so the contents slide cleanly */}
+            <div ref={parallaxRef} className="w-full h-full pt-24 pb-8 px-6 md:px-12 flex flex-col justify-between">
 
-                {/* Quick Links */}
-                <div className="col-span-1 flex flex-col gap-4">
-                    <h4 className="text-white/40 text-xs font-semibold tracking-widest uppercase mb-2">Explore</h4>
-                    <a href="#facility" data-hover className="text-sm font-medium hover:text-white/60 transition-colors w-max">The Facility</a>
-                    <a href="#trainers" data-hover className="text-sm font-medium hover:text-white/60 transition-colors w-max">The Roster</a>
-                    <a href="#programs" data-hover className="text-sm font-medium hover:text-white/60 transition-colors w-max">Programs</a>
-                    <a href="#membership" data-hover className="text-sm font-medium hover:text-white/60 transition-colors w-max">Membership</a>
-                </div>
-
-                {/* Legal / Socials */}
-                <div className="col-span-1 flex flex-col gap-4">
-                    <h4 className="text-white/40 text-xs font-semibold tracking-widest uppercase mb-2">Connect</h4>
-                    <a href="#instagram" data-hover className="text-sm font-medium hover:text-white/60 transition-colors w-max">Instagram</a>
-                    <a href="#youtube" data-hover className="text-sm font-medium hover:text-white/60 transition-colors w-max">YouTube</a>
-                    <a href="#contact" data-hover className="text-sm font-medium hover:text-white/60 transition-colors w-max">Contact Us</a>
-                    <a href="#terms" data-hover className="text-sm font-medium hover:text-white/60 transition-colors w-max">Terms & Conditions</a>
-                </div>
-
-                {/* Newsletter CTA */}
-                <div className="col-span-1 flex flex-col gap-4">
-                    <h4 className="text-white/40 text-xs font-semibold tracking-widest uppercase mb-2">Join the list</h4>
-                    <p className="text-sm text-white/50 mb-2">Exclusive updates, programming, and facility news.</p>
-                    <div className="flex border-b border-white/20 pb-2">
-                        <input
-                            type="email"
-                            placeholder="EMAIL ADDRESS"
-                            className="bg-transparent border-none outline-none w-full text-sm font-medium uppercase placeholder-white/30"
-                        />
-                        <button data-hover className="text-sm font-bold uppercase tracking-wider hover:text-white/60 transition-colors">
-                            Submit
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div
-                data-footer
-                // NEW: Adjusted padding and layout so it handles mobile naturally
-                className="w-full flex flex-col items-center justify-center border-t border-white/10 pt-12 md:pt-16 relative"
-            >
-                <h1
-                    ref={textRef}
-                    // NEW: Added hidden md:block to hide entirely on mobile devices
-                    className="hidden md:block text-[18vw] leading-none font-bold tracking-tighter uppercase text-white select-none"
-                    style={{
-                        WebkitMaskImage: 'radial-gradient(circle at -100px -100px, black 0px, transparent 0px)',
-                        maskImage: 'radial-gradient(circle at -100px -100px, black 0px, transparent 0px)'
-                    }}
+                <div
+                    ref={topRef}
+                    className="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8 mb-24"
                 >
-                    GYM NAME
-                </h1>
+                    {/* Brand Column */}
+                    <div className="col-span-1 md:col-span-1">
+                        <div className="flex items-center gap-2 text-xl font-bold tracking-tight mb-6">
+                            <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                                <path d={footerData.brand.logoPath} />
+                            </svg>
+                            {footerData.brand.name}
+                        </div>
+                        <p className="text-white/50 text-sm leading-relaxed max-w-xs">
+                            {footerData.brand.description}
+                        </p>
+                    </div>
 
-                {/* NEW: Changed from strictly absolute. Now it flows naturally on mobile and goes absolute on desktop */}
-                <div className="relative md:absolute bottom-0 w-full flex flex-col md:flex-row justify-between items-center md:items-end gap-2 md:gap-0 pb-2 px-6">
-                    <span className="text-xs text-white/30 font-medium text-center">© {new Date().getFullYear()} TOM FITNESS. ALL RIGHTS RESERVED.</span>
-                    <span className="text-xs text-white/30 font-medium text-center">BUILT FOR REAL RESULTS.</span>
+                    {/* Quick Links */}
+                    <div className="col-span-1 flex flex-col gap-4">
+                        <h4 className="text-white/40 text-xs font-semibold tracking-widest uppercase mb-2">
+                            {footerData.explore.title}
+                        </h4>
+                        {footerData.explore.links.map((link) => (
+                            <a key={link.id} href={link.href} data-hover className="text-sm font-medium hover:text-white/60 transition-colors w-max">
+                                {link.label}
+                            </a>
+                        ))}
+                    </div>
+
+                    {/* Legal / Socials */}
+                    <div className="col-span-1 flex flex-col gap-4">
+                        <h4 className="text-white/40 text-xs font-semibold tracking-widest uppercase mb-2">
+                            {footerData.connect.title}
+                        </h4>
+                        {footerData.connect.links.map((link) => (
+                            <a key={link.id} href={link.href} data-hover className="text-sm font-medium hover:text-white/60 transition-colors w-max">
+                                {link.label}
+                            </a>
+                        ))}
+                    </div>
+
+                    {/* Newsletter CTA */}
+                    <div className="col-span-1 flex flex-col gap-4">
+                        <h4 className="text-white/40 text-xs font-semibold tracking-widest uppercase mb-2">
+                            {footerData.newsletter.title}
+                        </h4>
+                        <p className="text-sm text-white/50 mb-2">{footerData.newsletter.description}</p>
+                        <div className="flex border-b border-white/20 pb-2">
+                            <input
+                                type="email"
+                                placeholder={footerData.newsletter.placeholder}
+                                className="bg-transparent border-none outline-none w-full text-sm font-medium uppercase placeholder-white/30"
+                            />
+                            <button data-hover className="text-sm font-bold uppercase tracking-wider hover:text-white/60 transition-colors">
+                                {footerData.newsletter.buttonText}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    data-footer
+                    className="w-full flex flex-col items-center justify-center border-t border-white/10 pt-12 md:pt-16 relative"
+                >
+                    <h1
+                        ref={textRef}
+                        className="hidden md:block text-[18vw] leading-none font-bold tracking-tighter uppercase text-white select-none"
+                        style={{
+                            WebkitMaskImage: 'radial-gradient(circle at -100px -100px, black 0px, transparent 0px)',
+                            maskImage: 'radial-gradient(circle at -100px -100px, black 0px, transparent 0px)'
+                        }}
+                    >
+                        {footerData.largeText}
+                    </h1>
+
+                    <div className="relative md:absolute bottom-0 w-full flex flex-col md:flex-row justify-between items-center md:items-end gap-2 md:gap-0 pb-2 px-6">
+                        <span className="text-xs text-white/30 font-medium text-center">
+                            © {new Date().getFullYear()} {footerData.bottomText.left}
+                        </span>
+                        <span className="text-xs text-white/30 font-medium text-center">
+                            {footerData.bottomText.right}
+                        </span>
+                    </div>
                 </div>
             </div>
         </footer>

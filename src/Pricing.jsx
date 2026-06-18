@@ -2,38 +2,9 @@ import React, { useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
+import { pricingData } from './data'; // Adjust the import path if necessary
 
 gsap.registerPlugin(ScrollTrigger);
-
-const pricingTiers = [
-    {
-        id: "01",
-        name: "The Grinder",
-        price: "600",
-        period: "Monthly",
-        desc: "Raw access. Come in, put your head down, do the work.",
-        features: ["24/7 Facility Access", "Standard Equipment", "Locker Room Access", "1 Guest Pass / Mo"],
-        bgImage: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=2070&auto=format&fit=crop",
-    },
-    {
-        id: "02",
-        name: "The Athlete",
-        price: "6,000",
-        period: "Yearly",
-        desc: "For those who train with purpose. Full access to recovery and specialized zones.",
-        features: ["Everything in Grinder", "Olympic Lifting Platforms", "Cold Plunge & Sauna", "Group Conditioning"],
-        bgImage: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=1965&auto=format&fit=crop",
-    },
-    {
-        id: "03",
-        name: "The Competitor",
-        price: "2900",
-        period: "Half Yearly",
-        desc: "Zero compromises. Elite programming, dedicated coaching, and priority access.",
-        features: ["Everything in Athlete", "1-on-1 Monthly Check-in", "Custom Programming", "Private Locker", "Supplement Stack Discount"],
-        bgImage: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop",
-    }
-];
 
 const PricingCard = ({ tier }) => {
     const cardRef = useRef(null);
@@ -229,16 +200,16 @@ export default function Pricing() {
             <div ref={headerRef} className="w-full max-w-7xl mx-auto px-6 md:px-12 mb-12 flex flex-col md:flex-row justify-between items-start md:items-end z-10">
                 <div>
                     <h2 className="text-5xl md:text-7xl font-bold tracking-tighter uppercase leading-none mb-2">
-                        Commitment
+                        {pricingData.header.title}
                     </h2>
                     <p className="text-white/50 text-sm md:text-base font-medium uppercase tracking-widest">
-                        Choose your weight.
+                        {pricingData.header.subtitle}
                     </p>
                 </div>
             </div>
 
             <div className="flex-1 w-full max-w-[1400px] mx-auto px-6 md:px-12 flex flex-col lg:flex-row gap-4 h-[80vh] lg:h-auto min-h-[600px]">
-                {pricingTiers.map((tier) => (
+                {pricingData.tiers.map((tier) => (
                     <PricingCard key={tier.id} tier={tier} />
                 ))}
             </div>

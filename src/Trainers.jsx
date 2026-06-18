@@ -2,24 +2,16 @@ import React, { useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
+import { trainersData } from './data'; // Adjust the import path if necessary
 
 gsap.registerPlugin(ScrollTrigger);
-
-const trainers = [
-  { name: "Marcus", specialty: "Powerlifting", img: "https://images.unsplash.com/photo-1604480133435-25b86862d276?w=500&auto=format&fit=crop&q=60" },
-  { name: "Elena", specialty: "Hypertrophy", img: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=1000&auto=format&fit=crop" },
-  { name: "David", specialty: "Biomechanics", img: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1000&auto=format&fit=crop" },
-  { name: "Sarah", specialty: "Conditioning", img: "https://images.unsplash.com/photo-1549476464-37392f717541?w=500&auto=format&fit=crop&q=60" },
-  { name: "Jax", specialty: "Olympic Lifting", img: "https://images.unsplash.com/photo-1577221084712-45b0445d2b00?w=500&auto=format&fit=crop&q=60" },
-  { name: "Nina", specialty: "Mobility", img: "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=1000&auto=format&fit=crop" },
-];
 
 export default function Trainers() {
   const containerRef = useRef(null);
   const cylinderRef = useRef(null);
   const spinTween = useRef(null); // Ref to hold our infinite animation
 
-  const totalCards = trainers.length;
+  const totalCards = trainersData.list.length;
   const anglePerCard = 360 / totalCards;
 
   useGSAP(() => {
@@ -78,7 +70,7 @@ export default function Trainers() {
           style={{ transform: 'translateZ(0px)' }}
         >
           <h2 className="text-7xl md:text-[12rem] font-bold tracking-tighter uppercase text-zinc-300 whitespace-nowrap text-center">
-            Roster
+            {trainersData.watermark}
           </h2>
         </div>
 
@@ -90,7 +82,7 @@ export default function Trainers() {
           className="absolute inset-0 flex items-center justify-center"
           style={{ transformStyle: 'preserve-3d' }}
         >
-          {trainers.map((trainer, i) => {
+          {trainersData.list.map((trainer, i) => {
             const rotationY = i * anglePerCard;
             const roundingClass = i % 2 === 0
               ? "rounded-tl-4xl rounded-br-4xl"
