@@ -2,6 +2,35 @@
 
 @import "tailwindcss";
 
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
+}
+
+@layer base {
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    /* Force the background to match your zinc-950 */
+    -webkit-box-shadow: 0 0 0 1000px #09090b inset !important;
+    /* Force the text color to white */
+    -webkit-text-fill-color: white !important;
+    /* Delay the background color change infinitely (Failsafe) */
+    transition: background-color 5000s ease-in-out 0s;
+  }
+}
+
 /* 1. Define your custom fonts */
 @font-face {
   font-family: "Lausanne";
