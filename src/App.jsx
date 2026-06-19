@@ -16,11 +16,13 @@ function App() {
   // State to trigger the hero animation
   const [loaderFinished, setLoaderFinished] = useState(false);
 
-
   // --------------------------------------------------------
   // THE LENIS & GSAP ENGINE (UPDATED FOR MAXIMUM SMOOTHNESS)
   // --------------------------------------------------------
   useEffect(() => {
+    // 1. HARD LOCK NATIVE SCROLL (Bulletproof fallback)
+    document.body.style.overflow = 'hidden';
+
     const lenis = new Lenis({
       lerp: 0.05,
       wheelMultiplier: 0.8,
@@ -28,8 +30,10 @@ function App() {
       smoothTouch: false,
     });
 
-    // 🔴 ADD THIS: Expose lenis globally so the Modal can access it
     window.lenis = lenis;
+
+    // 2. PAUSE THE LENIS ENGINE IMMEDIATELY
+    lenis.stop();
 
     lenis.on('scroll', ScrollTrigger.update);
 
@@ -44,13 +48,24 @@ function App() {
 
     return () => {
       lenis.destroy();
-      // 🔴 ADD THIS: Cleanup the global variable
       delete window.lenis;
       gsap.ticker.remove((time) => lenis.raf(time * 1000));
       resizeObserver.disconnect();
     };
   }, []);
 
+  // --------------------------------------------------------
+  // WATCH FOR LOADER COMPLETION
+  // --------------------------------------------------------
+  useEffect(() => {
+    if (loaderFinished) {
+      // 3. UNLOCK NATIVE SCROLL AND RESTART LENIS
+      document.body.style.overflow = '';
+      if (window.lenis) {
+        window.lenis.start();
+      }
+    }
+  }, [loaderFinished]);
 
   return (
     <>
@@ -63,4 +78,4 @@ function App() {
   )
 }
 
-export default App
+export default App;
